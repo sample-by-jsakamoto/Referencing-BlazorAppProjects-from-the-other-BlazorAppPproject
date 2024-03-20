@@ -1,0 +1,22 @@
+﻿@using System.Reflection
+<p>
+    Base Directory = [@(Assembly.GetExecutingAssembly().GetName().Name)]
+</p>
+<p>
+    Exists Xml Document Comment File = @_existsXmlDoc
+</p>
+
+<Component0 />
+
+@code
+{
+    private bool _existsXmlDoc;
+
+    protected override void OnInitialized()
+    {
+        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        var assemblyName = this.GetType().Assembly.GetName().Name;
+        var xmlDocPath = Path.Combine(baseDir, assemblyName + ".xml");
+        _existsXmlDoc =File.Exists(xmlDocPath);
+    }
+}

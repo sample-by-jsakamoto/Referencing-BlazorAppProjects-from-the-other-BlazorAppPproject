@@ -1,0 +1,11 @@
+﻿@inject IJSRuntime JSRuntime
+<div>
+    <Button OnClick="@(() => JSRuntime.InvokeVoidAsync("alert", "This is app 2."))">
+        Hello, App 2.
+    </Button>
+
+    <Component0 />
+
+    <Component1 />
+
+</div>

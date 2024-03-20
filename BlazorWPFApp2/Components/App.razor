@@ -1,0 +1,11 @@
+@inject IJSRuntime JSRuntime
+<div>
+    <Button OnClick="@(() => JSRuntime.InvokeVoidAsync("alert", "This is WPF App 2."))">
+        Hello, WPF App 2.
+    </Button>
+
+    <Component0 />
+
+    <Component1 />
+
+</div>
