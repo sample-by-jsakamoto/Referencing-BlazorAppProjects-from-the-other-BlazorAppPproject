@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWasmApp2", "BlazorWas
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{A3C8A5B0-F165-46BD-8AA6-79589FC3E9CE}"
 	ProjectSection(SolutionItems) = preProject
-		..\Build\Build.targets = ..\Build\Build.targets
+		Build\Build.targets = Build\Build.targets
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWasmApp0", "BlazorWasmApp0\BlazorWasmApp0.csproj", "{51ACE6E2-92F4-4867-9766-6F72DC468101}"
