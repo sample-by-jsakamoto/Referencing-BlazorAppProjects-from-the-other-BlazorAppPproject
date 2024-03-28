@@ -175,8 +175,8 @@
     For assets '...\blazor.webassembly.js' and '...\blazor.webassembly.js' from different projects. 
   -->
   <Target Name="_BS_Publish_RemoveAppProjectsStaticWebAssets"
-          BeforeTargets="GenerateStaticWebAssetsPublishManifest"
-          DependsOnTargets="$(GenerateStaticWebAssetsPublishManifestDependsOn);_BS_ResolveReferencedAppProject">
+          BeforeTargets="GeneratePublishWasmBootJson;GenerateStaticWebAssetsPublishManifest"
+          DependsOnTargets="_BS_ResolveReferencedAppProject">
     <_BS_PruneReferencedAppProjectsItems Items="@(StaticWebAsset)" ReferencedAppProjects="@(_BS_ReferencedAppProject)">
       <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedStaticWebAsset" />
     </_BS_PruneReferencedAppProjectsItems>
