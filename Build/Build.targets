@@ -74,17 +74,34 @@
         <![CDATA[
       static string GetPath(ITaskItem item) => item.GetMetadata("RootDir") + item.GetMetadata("Directory");
       var prunedItems = new List<ITaskItem>();
-      foreach (var appProj in this.ReferencedAppProjects) {
+
+      // Prune the assets of the referenced app projects for each app project.
+      foreach (var appProj in this.ReferencedAppProjects) 
+      {
         var appName = appProj.GetMetadata("Filename");
         var appBasePath = "_content/" + appName;
+
         var assets = this.Items
+        
+          // Filter the assets of the current app project in a loop.
           .Where(item => item.GetMetadata("SourceId") == appName)
           .Where(item => item.GetMetadata("AssetKind") == "All")
+
+          // Exclude the framework files that are under the "_framework" folder, such as "_framework/blazor.webassembly.js", "_framework/blazor.boot.json", etc.
+          .Where(item => item.GetMetadata("RelativePath")?.StartsWith("_framework/") != true)
+
+          // Exclude the app-bundled scoped css files, such as "*.styles.css", not "*.bundle.scp.css".
+          .Where(item => item.GetMetadata("AssetTraitName") == "ScopedCss" ? item.GetMetadata("AssetTraitValue") == "ProjectBundle" : true)
+
           .ToArray();
+
+        // Relocate the assets of the refereincing app project under the "_content/{appName}/" folder.
+        // (As an exception, the assets of the .js files are relocated under the root folder.)
         foreach (var asset in assets) {
-          var isRazorJs = asset.GetMetadata("OriginalItemSpec").EndsWith(".razor.js");
-          asset.SetMetadata("BasePath",  isRazorJs ? "/" : appBasePath);
+          var isJs = asset.GetMetadata("OriginalItemSpec").EndsWith(".js");
+          asset.SetMetadata("BasePath",  isJs ? "/" : appBasePath);
         }
+
         prunedItems.AddRange(assets);
       }
       
