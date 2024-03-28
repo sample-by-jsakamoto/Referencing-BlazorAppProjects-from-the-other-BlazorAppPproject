@@ -1,8 +1,11 @@
+using BlazorServerApp0;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddScoped<Helper>();
 
 var app = builder.Build();
 

@@ -1,4 +1,7 @@
 ﻿@using System.Reflection
+
+@inject Helper Helper
+
 <p>
     Base Directory = [@(Assembly.GetExecutingAssembly().GetName().Name)]
 </p>
@@ -8,9 +11,20 @@
 
 <Component0 />
 
+<div>
+    <button @onclick="OnClickShowPrompt">
+        Show Prompt
+    </button>
+    <span>
+        @_response
+    </span>
+</div>
+
 @code
 {
     private bool _existsXmlDoc;
+
+    private string? _response;
 
     protected override void OnInitialized()
     {
@@ -18,5 +32,10 @@
         var assemblyName = this.GetType().Assembly.GetName().Name;
         var xmlDocPath = Path.Combine(baseDir, assemblyName + ".xml");
         _existsXmlDoc =File.Exists(xmlDocPath);
+    }
+
+    private async Task OnClickShowPrompt()
+    {
+        _response = await this.Helper.PromptAsync("How's it going?");
     }
 }

@@ -1,10 +1,26 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@inject Helper Helper
 <div>
-    <Button OnClick="@(() => JSRuntime.InvokeVoidAsync("alert", "This is app 2."))">
-        Hello, App 2.
-    </Button>
+    <div>
+        <Button OnClick="OnClickButton">
+            Hello, Server App 2.
+        </Button>
+        <span>
+            @_response
+        </span>
+    </div>
 
     <Component0 />
 
     <Component1 />
+
 </div>
+
+@code
+{
+    private string? _response;
+
+    private async Task OnClickButton()
+    {
+        _response = await this.Helper.PromptAsync("I'm Server App 2. How are you?");
+    }
+}

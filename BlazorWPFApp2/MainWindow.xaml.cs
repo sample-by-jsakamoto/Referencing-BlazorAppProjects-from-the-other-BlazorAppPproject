@@ -14,6 +14,7 @@ public partial class MainWindow : Window
 
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddWpfBlazorWebView();
+        serviceCollection.AddScoped<BlazorServerApp0.Helper>();
 #if DEBUG
         serviceCollection.AddBlazorWebViewDeveloperTools();
 #endif

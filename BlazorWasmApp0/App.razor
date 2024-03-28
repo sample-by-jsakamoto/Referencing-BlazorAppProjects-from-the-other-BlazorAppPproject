@@ -1,1 +1,21 @@
-﻿<Component0/>
+﻿@inject Helper Helper
+<Component0 />
+
+<div>
+    <button @onclick="OnClickShowPrompt">
+        Show Prompt
+    </button>
+    <span>
+        @_response
+    </span>
+</div>
+
+@code
+{
+    private string? _response;
+
+    private async Task OnClickShowPrompt()
+    {
+        _response = await this.Helper.PromptAsync("How's it going?");
+    }
+}
