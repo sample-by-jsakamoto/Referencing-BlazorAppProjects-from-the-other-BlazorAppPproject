@@ -218,7 +218,7 @@
   <Target Name="_BS_Publish_RemoveAppProjectsContent"
           AfterTargets="GetCopyToPublishDirectoryItems"
           BeforeTargets="_ComputeCopyToPublishDirectoryItems"
-          DependsOnTargets="_BS_ResolveReferencedAppProject" Condition="false">
+          DependsOnTargets="_BS_ResolveReferencedAppProject">
     <_BS_PruneReferencedAppProjectsItems
       Items="@(_SourceItemsToCopyToPublishDirectory)"
       ReferencedAppProjects="@(_BS_ReferencedAppProject)"
