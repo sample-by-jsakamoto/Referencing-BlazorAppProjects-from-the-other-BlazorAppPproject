@@ -1,0 +1,26 @@
+﻿@inject Helper Helper
+<div>
+    <div>
+        <Button OnClick="OnClickButton">
+            Hello, Main Server App.
+        </Button>
+        <span>
+            @_response
+        </span>
+    </div>
+
+    <Component0 />
+
+    <Component1 />
+
+</div>
+
+@code
+{
+    private string? _response;
+
+    private async Task OnClickButton()
+    {
+        _response = await this.Helper.PromptAsync("I'm Main Server App. How are you?");
+    }
+}
