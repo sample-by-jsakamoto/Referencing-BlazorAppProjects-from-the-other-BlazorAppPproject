@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using BlazorMixApps.Test.Fixtures;
 using Toolbelt;
 using static Toolbelt.Diagnostics.XProcess;
@@ -11,10 +12,13 @@ public class BuildAnRunTests
     private readonly HttpClient _httpClient = new();
 
     private static IEnumerable<object[]> TestCases { get; } = [
-    [8, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
-    [9, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
-    [8, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
-    [9, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    // targetFrameworkVer, sdkVersion, mainProject, referencedProjects[]
+    [8, 8, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [8, 9, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [9, 9, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [8, 8, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [8, 9, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [9, 9, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
     ];
 
     private string GetBinLogPath(int sdkVersion, string actionName, string projectName)
@@ -29,7 +33,7 @@ public class BuildAnRunTests
     /// Copy projects to temp directory and set SDK version in global.json.
     /// </summary>
     /// <param name="sdkVersion">Specify the .NET SDK version to use in this work space. <br/>This method will create a global.json file in the work space dir to specify the SDK version.</param>
-    private async ValueTask<WorkDirectory> PrepareWorkspaceAsync(int sdkVersion)
+    private async ValueTask<WorkDirectory> PrepareWorkspaceAsync(int targetFrameworkVer, int sdkVersion, string mainProject)
     {
         // GIVEN: Copy projects to temporary working directory
         var slnDir = FileIO.FindContainerDirToAncestor("BlazorMixApps.Tests.sln");
@@ -44,26 +48,33 @@ public class BuildAnRunTests
         dotnetVersion.ExitCode.Is(0);
         dotnetVersion.Output.StartsWith($"{sdkVersion}.").IsTrue();
 
+        // GIVEN: Rewrite the <TargetFramework> in the main project file
+        var projectFilePath = Path.Combine(workDir, mainProject, $"{mainProject}.csproj");
+        var projectFile = XDocument.Load(projectFilePath);
+        var targetFrameworkNode = projectFile.Root?.Element("PropertyGroup")?.Element("TargetFramework") ?? throw new Exception("The project file is not valid.");
+        targetFrameworkNode.Value = $"net{targetFrameworkVer}.0";
+        projectFile.Save(projectFilePath);
+
         return workDir;
     }
 
     [TestCaseSource(nameof(TestCases))]
-    public async Task Build_and_Run_Test(int sdkVersion, string mainProject, string[] referencedProjects)
+    public async Task Build_and_Run_Test(int targetFrameworkVer, int sdkVersion, string mainProject, string[] referencedProjects)
     {
-        // GIVEN: Copy projects to temp directory and set SDK version in global.json.
-        using var workDir = await this.PrepareWorkspaceAsync(sdkVersion);
+        // GIVEN: Copy projects to temp directory, set SDK version in global.json, and rewrite the <TargetFramework> in the main project file.
+        using var workDir = await this.PrepareWorkspaceAsync(targetFrameworkVer, sdkVersion, mainProject);
 
         // WHEN: Build the project,
         var projectDir = Path.Combine(workDir, mainProject);
         var binLog = this.GetBinLogPath(sdkVersion, "build", mainProject);
-        using var dotnetBuild = await Start("dotnet", $"build -bl:\"{binLog}\"", projectDir).WaitForExitAsync();
+        using var dotnetBuild = await Start("dotnet", $"build -f net{targetFrameworkVer}.0 -bl:\"{binLog}\"", projectDir).WaitForExitAsync();
 
         // THEN: and it should succeed
         dotnetBuild.ExitCode.Is(0, message: dotnetBuild.Output);
 
         // WHEN: Run the project,
         var url = $"http://localhost:{TcpNetwork.GetFreeTcpPortNumber()}";
-        using var dotnetRun = Start("dotnet", $"run --no-build --urls {url}", projectDir);
+        using var dotnetRun = Start("dotnet", $"run -f net{targetFrameworkVer}.0 --no-build --urls {url}", projectDir);
         var success = await dotnetRun.WaitForOutputAsync(output => output.Contains("Application started"), millsecondsTimeout: 5000);
         success.IsTrue(message: dotnetRun.Output);
 
@@ -72,16 +83,16 @@ public class BuildAnRunTests
     }
 
     [TestCaseSource(nameof(TestCases))]
-    public async Task Publish_Test(int sdkVersion, string mainProject, string[] referencedProjects)
+    public async Task Publish_Test(int targetFrameworkVer, int sdkVersion, string mainProject, string[] referencedProjects)
     {
-        // GIVEN: Copy projects to temp directory and set SDK version in global.json.
-        using var workDir = await this.PrepareWorkspaceAsync(sdkVersion);
+        // GIVEN: Copy projects to temp directory, set SDK version in global.json, and rewrite the <TargetFramework> in the main project file.
+        using var workDir = await this.PrepareWorkspaceAsync(targetFrameworkVer, sdkVersion, mainProject);
 
         // WHEN: Publish the project,
         var projectDir = Path.Combine(workDir, mainProject);
         var distDir = Path.Combine(workDir, "dist");
         var binLog = this.GetBinLogPath(sdkVersion, "publish", mainProject);
-        using var dotnetPublish = await Start("dotnet", $"publish -c Release -o \"{distDir}\" -bl:\"{binLog}\"", projectDir).WaitForExitAsync();
+        using var dotnetPublish = await Start("dotnet", $"publish -c Release -f net{targetFrameworkVer}.0 -o \"{distDir}\" -bl:\"{binLog}\"", projectDir).WaitForExitAsync();
 
         // THEN: and it should succeed
         dotnetPublish.ExitCode.Is(0, message: dotnetPublish.Output);
