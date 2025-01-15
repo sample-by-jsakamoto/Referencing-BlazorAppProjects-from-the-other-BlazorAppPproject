@@ -59,7 +59,6 @@
     </ItemGroup>
   </Target>
 
-
   <Target Name="_BS_Build_Remove_and_Rebase_AppProjects_StaticWebAssetEndPoints"
     AfterTargets="ResolveReferencedProjectsStaticWebAssets"
     DependsOnTargets="_BS_Build_RemoveAppProjectsStaticWebAssets">
@@ -67,36 +66,9 @@
       <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedStaticWebAssetEndPoint" />
     </_BS_FilterAndRebaseStaticWebAssetEndPoints>
     <ItemGroup>
-
       <StaticWebAssetEndPoint Remove="@(StaticWebAssetEndPoint)" />
       <StaticWebAssetEndPoint Include="@(_BS_PrunedStaticWebAssetEndPoint)" />
       <_BS_PrunedStaticWebAssetEndPoint Remove="@(_BS_PrunedStaticWebAssetEndPoint)" />
-
-    </ItemGroup>
-  </Target>
-
-  <!-- 
-  *** FOR PUBLISH - Remove App Projects Static Web Assets ***
-
-  If you don't have this target, *.razor.js files in referenced app projects are deployed under the "_content/{appName}/" folders.
-  It will cause the HTTP 404 error for importing those .js file from those app's code.
-
-  * On Blazor WebAssembly projects
-    If you don't have this target, you will see the following error when you build Blazor WebAssembly projects.
-    Microsoft.NET.Sdk.StaticWebAssets.Publish.targets(25,5): error : Conflicting assets with the same target path '_framework/blazor.webassembly.js'. 
-    For assets '...\blazor.webassembly.js' and '...\blazor.webassembly.js' from different projects. 
-  -->
-  <Target Name="_BS_Publish_RemoveAppProjectsStaticWebAssets"
-    BeforeTargets="GeneratePublishWasmBootJson;GenerateStaticWebAssetsPublishManifest"
-    DependsOnTargets="_BS_ResolveReferencedAppProject"
-    Condition="false">
-    <_BS_FilterAndRebaseItems Items="@(StaticWebAsset)" ReferencedAppProjects="@(_BS_ReferencedAppProject)">
-      <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedStaticWebAsset" />
-    </_BS_FilterAndRebaseItems>
-    <ItemGroup>
-      <StaticWebAsset Remove="@(StaticWebAsset)" />
-      <StaticWebAsset Include="@(_BS_PrunedStaticWebAsset)" />
-      <_BS_PrunedStaticWebAsset Remove="@(_BS_PrunedStaticWebAsset)" />
     </ItemGroup>
   </Target>
 
