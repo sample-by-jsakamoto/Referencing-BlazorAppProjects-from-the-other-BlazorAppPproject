@@ -25,7 +25,7 @@ Fortunately, you can work around this limitation by importing [the MSBuild scrip
 
 That MSBuild script is designed to be imported into the Blazor app project, which references other Blazor app projects. That MSBuild script includes hacks to avoid the abovementioned problems when a Blazor app project references other Blazor app projects.
 
-You can try this solution by cloning this repository and running the `BlazorServerApp2`, `BlazorWasmApp2`, and `BlazorWPFApp2` projects.
+You can try this solution by cloning this repository and running the `MainServerApp`, `MainWasmApp`, and `MainWPFApp` projects.
 
 ## License
 

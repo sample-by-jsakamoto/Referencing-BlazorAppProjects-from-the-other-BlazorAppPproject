@@ -26,6 +26,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerApp0", "Referenced\Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainWPFApp", "MainWPFApp\MainWPFApp.csproj", "{972ACA09-6AB7-2A33-2765-288910F0AC5D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CustomTasks", "CustomTasks", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		Build\CustomTasks\_BS_BundleAppProjectsScopedCss.targets = Build\CustomTasks\_BS_BundleAppProjectsScopedCss.targets
+		Build\CustomTasks\_BS_FilterAndRebaseItems.targets = Build\CustomTasks\_BS_FilterAndRebaseItems.targets
+		Build\CustomTasks\_BS_FilterAndRebaseStaticWebAssetEndPoints.targets = Build\CustomTasks\_BS_FilterAndRebaseStaticWebAssetEndPoints.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +81,7 @@ Global
 		{F6BC2998-EEA5-41F8-BDCC-CD1B7DD20A9A} = {E0C99CFA-A175-4DED-B83F-DBC0400A3099}
 		{7C053F80-F4F7-7182-F3D6-41B70D8F7840} = {E0C99CFA-A175-4DED-B83F-DBC0400A3099}
 		{C7005814-FB4D-22F8-4C7F-E74732F3F5AC} = {E0C99CFA-A175-4DED-B83F-DBC0400A3099}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0D287715-B76C-4DD5-9B67-481F4FD1B270}
