@@ -7,9 +7,9 @@
     </ItemGroup>
   </Target>
 
-  <Import Project="CustomTasks\_BS_BundleAppProjectsScopedCss.targets" />
-  <Import Project="CustomTasks\_BS_FilterAndRebaseItems.targets" />
-  <Import Project="CustomTasks\_BS_FilterAndRebaseStaticWebAssetEndPoints.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)CustomTasks\_BS_BundleAppProjectsScopedCss.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)CustomTasks\_BS_FilterAndRebaseItems.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)CustomTasks\_BS_FilterAndRebaseStaticWebAssetEndPoints.targets" />
 
   <!--
   *** FOR BUILD - Bundle Scoped Css of App Projects ***
