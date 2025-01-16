@@ -101,9 +101,12 @@ public class BuildAnRunTests
         var tcpPort = TcpNetwork.GetFreeTcpPortNumber();
         var url = $"http://localhost:{tcpPort}";
         var wwwrootDir = Path.Combine(distDir, "wwwroot");
+        var testProjDir = FileIO.FindContainerDirToAncestor("BlazorMixApps.Test.csproj");
+        (await Start("dotnet", "tool restore", testProjDir).WaitForExitAsync()).Dispose();
+
         using var dotnetExec =
             File.Exists(Path.Combine(distDir, $"{mainProject}.dll")) ? Start("dotnet", $"exec \"{mainProject}.dll\" --urls {url}", distDir) :
-            Directory.Exists(wwwrootDir) ? Start("dotnet", $"serve -d:\"{wwwrootDir}\" -p:{tcpPort} --default-extensions:html")
+            Directory.Exists(wwwrootDir) ? Start("dotnet", $"serve -d:\"{wwwrootDir}\" -p:{tcpPort} --default-extensions:html", testProjDir)
             : throw new Exception("The published app is not tested yet.");
 
         var success = await dotnetExec.WaitForOutputAsync(output => output.Contains("Press CTRL+C to ", StringComparison.InvariantCultureIgnoreCase), millsecondsTimeout: 5000);
