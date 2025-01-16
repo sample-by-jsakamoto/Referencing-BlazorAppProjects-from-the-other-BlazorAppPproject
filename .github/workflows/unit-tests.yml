@@ -22,4 +22,4 @@ jobs:
 
       # Perform unit tests
       - name: Perform unit tests
-        run: dotnet test Tests/BlazorMixApps.Test.csproj -l "console;verbosity=normal" -v:q --nologo
+        run: dotnet run --project ./Tests --noresult --labels=All
