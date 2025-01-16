@@ -1,4 +1,4 @@
-# Referencing Blazor app projects (not Razor class library projects) from the other Blazor app project
+# Referencing Blazor app projects (not Razor class library projects) from the other Blazor app project [![unit tests](https://github.com/sample-by-jsakamoto/Referencing-BlazorAppProjects-from-the-other-BlazorAppPproject/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/sample-by-jsakamoto/Referencing-BlazorAppProjects-from-the-other-BlazorAppPproject/actions/workflows/unit-tests.yml)
 
 ## Introduction
 
