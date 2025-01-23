@@ -19,7 +19,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Referenced\WasmApp0\WasmApp0.csproj" />
     <ProjectReference Include="..\Referenced\WasmApp1\WasmApp1.csproj" />
-    <ProjectReference Include="..\Referenced\RazorLib1\RazorLib1.csproj" />
   </ItemGroup>
 
   <Import Project="..\Build\Build.targets" />
