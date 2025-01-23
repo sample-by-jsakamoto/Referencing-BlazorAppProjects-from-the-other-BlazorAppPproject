@@ -35,7 +35,10 @@ foreach (var appProj in this.ReferencedAppProjects)
         .Where(item => !item.ItemSpec.StartsWith("_framework/"))
 
         // Exclude the app-bundled scoped css files, such as "*.styles.css", not "*.bundle.scp.css".
+        // (and also, exclude the gzip and brotli compressed files.)
         .Where(item => !item.ItemSpec.EndsWith(".styles.css"))
+        .Where(item => !item.ItemSpec.EndsWith(".styles.css.gz"))
+        .Where(item => !item.ItemSpec.EndsWith(".styles.css.br"))
 
         .ToArray();
 
@@ -62,13 +65,11 @@ foreach (var appProj in this.ReferencedAppProjects)
 
         if (relocatedItem.GetMetadata("EndpointProperties") is string endpointProperties)
         {
-            this.Log.LogMessage(MessageImportance.High, $"EndpointProperties - BEFORE: {endpointProperties}");
             endpointProperties = Regex.Replace(endpointProperties, @"""Name"":""label"",""Value"":""([^""]+)""", match => 
             {
                 var value = match.Groups[1].Value;
                 return $@"""Name"":""label"",""Value"":""{appBasePath}{value}""";
             });
-            this.Log.LogMessage(MessageImportance.High, $"EndpointProperties - AFTER: {endpointProperties}");
             relocatedItem.SetMetadata("EndpointProperties", endpointProperties);
         }
 

@@ -34,6 +34,10 @@ foreach (var appProj in this.ReferencedAppProjects)
 
         // Exclude the app-bundled scoped css files, such as "*.styles.css", not "*.bundle.scp.css".
         .Where(item => item.GetMetadata("AssetTraitName") == "ScopedCss" ? item.GetMetadata("AssetTraitValue") == "ProjectBundle" : true)
+        
+        // Exclude the compressed version of app-bundled scoped css files, such as "*.styles.css".
+        .Where(item => !(item.GetMetadata("AssetTraitName") == "Content-Encoding" && item.GetMetadata("AssetTraitValue") == "gzip" && item.GetMetadata("RelatedAsset")?.EndsWith(".styles.css") == true))
+        .Where(item => !(item.GetMetadata("AssetTraitName") == "Content-Encoding" && item.GetMetadata("AssetTraitValue") == "brotli" && item.GetMetadata("RelatedAsset")?.EndsWith(".styles.css") == true))
 
         .ToArray();
 
