@@ -19,12 +19,14 @@ internal static class TcpNetwork
     /// <returns>An enumerable of used TCP port numbers.</returns>
     private static IEnumerable<int> GetUsedTcpPorts() => IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpConnections().Select(tcp => tcp.LocalEndPoint.Port);
 
+    private static int _portNumber = 6000;
+
     /// <summary>
     /// Enumerates candidate TCP port numbers.
     /// </summary>
     /// <returns>An enumerable of candidate TCP port numbers.</returns>
     private static IEnumerable<int> EnumCandidatePorts()
     {
-        for (; ; ) { yield return Random.Shared.Next(6000, 7000); }
+        for (; ; ) { yield return Interlocked.Increment(ref _portNumber); }
     }
 }
