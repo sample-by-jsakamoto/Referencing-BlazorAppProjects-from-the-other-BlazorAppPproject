@@ -75,7 +75,7 @@ public class BuildAnRunTests
         // WHEN: Run the project,
         var url = $"http://localhost:{TcpNetwork.GetFreeTcpPortNumber()}";
         using var dotnetRun = Start("dotnet", $"run -f net{targetFrameworkVer}.0 --no-build --urls {url}", projectDir);
-        var success = await dotnetRun.WaitForOutputAsync(output => output.Contains("Application started"), millsecondsTimeout: 5000);
+        var success = await dotnetRun.WaitForOutputAsync(output => output.Contains("Application started"), options => options.IdleTimeout = 5000);
         success.IsTrue(message: dotnetRun.Output);
 
         // THEN: and it should serve static web assets including other referenced projects' assets
@@ -109,7 +109,7 @@ public class BuildAnRunTests
             Directory.Exists(wwwrootDir) ? Start("dotnet", $"serve -d:\"{wwwrootDir}\" -p:{tcpPort} --default-extensions:html", testProjDir)
             : throw new Exception("The published app is not tested yet.");
 
-        var success = await dotnetExec.WaitForOutputAsync(output => output.Contains("Press CTRL+C to ", StringComparison.InvariantCultureIgnoreCase), millsecondsTimeout: 5000);
+        var success = await dotnetExec.WaitForOutputAsync(output => output.Contains("Press CTRL+C to ", StringComparison.InvariantCultureIgnoreCase), options => options.IdleTimeout = 5000);
         success.IsTrue(message: dotnetExec.Output);
 
         // THEN: and it should serve static web assets including other referenced projects' assets
