@@ -22,4 +22,4 @@ jobs:
 
       # Perform unit tests
       - name: Perform unit tests
-        run: dotnet run --project ./Tests --noresult --labels=All
+        run: dotnet run --project ./Tests/BlazorMixApps.Test.csproj
