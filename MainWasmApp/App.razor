@@ -1,4 +1,6 @@
 ﻿@inject Helper Helper
+@inject IConfiguration Configuration
+
 <div>
     <div>
         <Button OnClick="OnClickButton">
@@ -21,6 +23,6 @@
 
     private async Task OnClickButton()
     {
-        _response = await this.Helper.PromptAsync("I'm Wasm App 2. How are you?");
+        _response = await this.Helper.PromptAsync(this.Configuration["messages:MainWasmApp:App"] ?? "(message)");
     }
 }

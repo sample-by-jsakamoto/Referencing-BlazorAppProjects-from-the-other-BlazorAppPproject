@@ -1,4 +1,5 @@
 ﻿@inject IJSRuntime JSRuntime
+@inject IConfiguration Configuration
 
 <div class="my-component" @onclick="OnClickThisComponent">
     This component is defined in the <strong>WasmApp0</strong>.
@@ -9,6 +10,6 @@
     private async Task OnClickThisComponent()
     {
         await using var module = await this.JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Component0.razor.js");
-        await module.InvokeVoidAsync("showMessage", "Hello from Component0 in WasmApp0!");
+        await module.InvokeVoidAsync("showMessage", this.Configuration["messages:WasmApp0:Component0"] ?? "(message)");
     }
 }

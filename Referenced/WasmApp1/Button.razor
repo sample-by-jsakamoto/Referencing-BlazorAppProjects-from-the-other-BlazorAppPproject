@@ -1,4 +1,6 @@
-﻿<button @onclick="OnClick">
+﻿@inject IConfiguration Configuration
+
+<button @onclick="OnClick" style="@(this.Configuration["Styles:WasmApp1:Button"])">
     @ChildContent
 </button>
 
