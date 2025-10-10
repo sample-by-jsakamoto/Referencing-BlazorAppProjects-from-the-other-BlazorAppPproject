@@ -13,12 +13,17 @@ public class BuildAnRunTests
 
     private static IEnumerable<object[]> TestCases { get; } = [
     // targetFrameworkVer, sdkVersion, mainProject, referencedProjects[]
-    [8, 8, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
-    [8, 9, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
-    [9, 9, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
-    [8, 8, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
-    [8, 9, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
-    [9, 9, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [8,  8, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [8,  9, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [9,  9, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [8, 10, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [9, 10, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+
+    [8,  8, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [8,  9, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [9,  9, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [8, 10, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [9, 10, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
     ];
 
     private string GetBinLogPath(int sdkVersion, string actionName, string projectName)
@@ -40,7 +45,14 @@ public class BuildAnRunTests
         var workDir = WorkDirectory.CreateCopyFrom(slnDir, path => !(path.Name.StartsWith(".") || "dist;Tests;bin;obj;work;binlogs".Split(';').Contains(path.Name)));
 
         // GIVEN: Create global.json to specify the SDK version
-        var globalJson = new GlobalJson { Sdk = new() { Version = $"{sdkVersion}.0.0" } };
+        var globalJson = new GlobalJson
+        {
+            Sdk = new()
+            {
+                Version = $"{sdkVersion}.0.0",
+                AllowPrerelease = sdkVersion >= 9,
+            }
+        };
         globalJson.Save(Path.Combine(workDir, "global.json"));
 
         // GIVEN: Verify the SDK version
