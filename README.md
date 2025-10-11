@@ -27,6 +27,10 @@ That MSBuild script is designed to be imported into the Blazor app project, whic
 
 You can try this solution by cloning this repository and running the `MainServerApp`, `MainWasmApp`, and `MainWPFApp` projects.
 
+## Supported .NET SDK Versions
+
+8.0.x, 9.0.x, and 10.0.x.
+
 ## License
 
 The MSBuild script (.targets file) in this repository is licensed under [The Unlicense](LICENSE).
