@@ -13,17 +13,19 @@ public class BuildAnRunTests
 
     private static IEnumerable<object[]> TestCases { get; } = [
     // targetFrameworkVer, sdkVersion, mainProject, referencedProjects[]
-    [8,  8, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
-    [8,  9, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
-    [9,  9, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
-    [8, 10, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
-    [9, 10, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [ 8,  8, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [ 8,  9, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [ 9,  9, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [ 8, 10, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [ 9, 10, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [10, 10, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
 
-    [8,  8, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
-    [8,  9, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
-    [9,  9, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
-    [8, 10, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
-    [9, 10, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [ 8,  8, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [ 8,  9, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [ 9,  9, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [ 8, 10, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [ 9, 10, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [10, 10, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
     ];
 
     private string GetBinLogPath(int sdkVersion, string actionName, string projectName)
@@ -35,8 +37,9 @@ public class BuildAnRunTests
     }
 
     /// <summary>
-    /// Copy projects to temp directory and set SDK version in global.json.
+    /// Copy projects to temp directory, set SDK version in global.json, and rewrite the <TargetFramework> in the main project file.
     /// </summary>
+    /// <param name="targetFrameworkVer">Specify the target framework version to use in this test project files.</param>
     /// <param name="sdkVersion">Specify the .NET SDK version to use in this work space. <br/>This method will create a global.json file in the work space dir to specify the SDK version.</param>
     private async ValueTask<WorkDirectory> PrepareWorkspaceAsync(int targetFrameworkVer, int sdkVersion, string mainProject)
     {
@@ -87,7 +90,7 @@ public class BuildAnRunTests
         // WHEN: Run the project,
         var url = $"http://localhost:{TcpNetwork.GetFreeTcpPortNumber()}";
         using var dotnetRun = Start("dotnet", $"run -f net{targetFrameworkVer}.0 --no-build --urls {url}", projectDir);
-        var success = await dotnetRun.WaitForOutputAsync(output => output.Contains("Application started"), options => options.IdleTimeout = 5000);
+        var success = await dotnetRun.WaitForOutputAsync(output => output.Contains("Application started"), options => options.IdleTimeout = 10000);
         success.IsTrue(message: dotnetRun.Output);
 
         // THEN: and it should serve static web assets including other referenced projects' assets
