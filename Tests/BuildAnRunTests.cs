@@ -4,9 +4,10 @@ using BlazorMixApps.Test.Fixtures;
 using Toolbelt;
 using static Toolbelt.Diagnostics.XProcess;
 
+[assembly: LevelOfParallelism(4)]
+
 namespace BlazorMixApps.Test;
 
-[Parallelizable(ParallelScope.Children)]
 public class BuildAnRunTests
 {
     private readonly HttpClient _httpClient = new();
@@ -28,12 +29,12 @@ public class BuildAnRunTests
     [10, 10, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
     ];
 
-    private string GetBinLogPath(int sdkVersion, string actionName, string projectName)
+    private string GetBinLogPath(int targetFrameworkVer,int sdkVersion, string actionName, string projectName)
     {
         var slnDir = FileIO.FindContainerDirToAncestor("BlazorMixApps.Tests.slnx");
         var binlogsDir = Path.Combine(slnDir, "binlogs");
         Directory.CreateDirectory(binlogsDir);
-        return Path.Combine(binlogsDir, $"{DateTime.Now:yyyy-MM-dd-HHmmss.fff}-sdk-{sdkVersion}-{actionName}-{projectName}.binlog");
+        return Path.Combine(binlogsDir, $"{DateTime.Now:yyyy-MM-dd-HHmmss.fff}-sdk-{sdkVersion}-{actionName}-{projectName}-net{targetFrameworkVer}.binlog");
     }
 
     /// <summary>
@@ -73,6 +74,7 @@ public class BuildAnRunTests
         return workDir;
     }
 
+    [Parallelizable(ParallelScope.Children)]
     [TestCaseSource(nameof(TestCases))]
     public async Task Build_and_Run_Test(int targetFrameworkVer, int sdkVersion, string mainProject, string[] referencedProjects)
     {
@@ -81,7 +83,7 @@ public class BuildAnRunTests
 
         // WHEN: Build the project,
         var projectDir = Path.Combine(workDir, mainProject);
-        var binLog = this.GetBinLogPath(sdkVersion, "build", mainProject);
+        var binLog = this.GetBinLogPath(targetFrameworkVer, sdkVersion, "build", mainProject);
         using var dotnetBuild = await Start("dotnet", $"build -f net{targetFrameworkVer}.0 -bl:\"{binLog}\"", projectDir).WaitForExitAsync();
 
         // THEN: and it should succeed
@@ -94,9 +96,10 @@ public class BuildAnRunTests
         success.IsTrue(message: dotnetRun.Output);
 
         // THEN: and it should serve static web assets including other referenced projects' assets
-        await this.Verify(mainProject, referencedProjects, url);
+        await this.Verify(mainProject, referencedProjects, url, configuration: "Development");
     }
 
+    [Parallelizable(ParallelScope.Children)]
     [TestCaseSource(nameof(TestCases))]
     public async Task Publish_Test(int targetFrameworkVer, int sdkVersion, string mainProject, string[] referencedProjects)
     {
@@ -106,7 +109,7 @@ public class BuildAnRunTests
         // WHEN: Publish the project,
         var projectDir = Path.Combine(workDir, mainProject);
         var distDir = Path.Combine(workDir, "dist");
-        var binLog = this.GetBinLogPath(sdkVersion, "publish", mainProject);
+        var binLog = this.GetBinLogPath(targetFrameworkVer, sdkVersion, "publish", mainProject);
         using var dotnetPublish = await Start("dotnet", $"publish -c Release -f net{targetFrameworkVer}.0 -o \"{distDir}\" -bl:\"{binLog}\"", projectDir).WaitForExitAsync();
 
         // THEN: and it should succeed
@@ -128,10 +131,10 @@ public class BuildAnRunTests
         success.IsTrue(message: dotnetExec.Output);
 
         // THEN: and it should serve static web assets including other referenced projects' assets
-        await this.Verify(mainProject, referencedProjects, url);
+        await this.Verify(mainProject, referencedProjects, url, configuration: "Release");
     }
 
-    private async Task Verify(string mainProject, string[] referencedProjects, string url)
+    private async Task Verify(string mainProject, string[] referencedProjects, string url, string configuration)
     {
         // The "<Main Project>.styles.css" should be exist
         var appStylesCss = await this._httpClient.GetStringAsync($"{url}/{mainProject}.styles.css");
@@ -159,5 +162,27 @@ public class BuildAnRunTests
 
         var razorJs = await this._httpClient.GetStringAsync($"{url}/Components/Component0.razor.js");
         razorJs.Is("export const showMessage = (message) => alert(message); ");
+
+        // Verify the UI behavior
+
+        await using var playwrightLauncher = new PlaywrightLauncher();
+        var page = await playwrightLauncher.GetPageAsync();
+        await page.GotoAndWaitForReadyAsync(url);
+
+        // Check the button text and background color
+        var button = page.Locator("button");
+        var expectedButtonText = $"I'm {mainProject}. How are you?" + configuration switch { "Development" => " (Environment = Development)", _ => "" };
+        await page.AssertEqualsAsync(_ => button.InnerTextAsync(), expectedButtonText);
+        await page.AssertEqualsAsync(_ => button.CSSValueAsync("backgroundColor"), "rgb(81, 43, 212)");
+
+        // Click the button to trigger the prompt dialog and verify the response
+        var response = page.Locator(".response");
+        var expectedPromptMessage = Guid.NewGuid().ToString("N");
+        page.Dialog += async (_, dialog) =>
+        {
+            await dialog.AcceptAsync(expectedPromptMessage);
+        };
+        await button.ClickAsync();
+        await page.AssertEqualsAsync(_ => response.InnerTextAsync(), expectedPromptMessage);
     }
 }

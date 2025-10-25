@@ -1,4 +1,6 @@
-﻿<button @onclick="OnClick">
+﻿@inject IConfiguration Configuration
+
+<button @onclick="OnClick" style="@(this.Configuration["Styles:ServerApp1:Button"])">
     @ChildContent
 </button>
 
@@ -9,5 +11,4 @@
 
     [Parameter]
     public EventCallback<MouseEventArgs> OnClick { get; set; }
-
 }

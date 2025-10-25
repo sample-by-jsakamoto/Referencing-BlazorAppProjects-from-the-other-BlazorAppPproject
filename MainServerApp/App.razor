@@ -1,10 +1,14 @@
-﻿@inject Helper Helper
+﻿@using System.Runtime.InteropServices
+@inject Helper Helper
+@inject IJSRuntime JSRuntime
+@inject IConfiguration Configuration
+
 <div>
     <div>
         <Button OnClick="OnClickButton">
-            Hello, Main Server App.
+            @_prompt
         </Button>
-        <span>
+        <span class="response">
             @_response
         </span>
     </div>
@@ -13,14 +17,33 @@
 
     <Component1 />
 
+    <div class="runtime-info">
+        <span class="process-architecture">@RuntimeInformation.ProcessArchitecture</span> |
+        <span class="framework-description">@RuntimeInformation.FrameworkDescription</span>
+    </div>
 </div>
 
 @code
 {
+    private string _prompt = "(message)";
+
     private string? _response;
+
+    override protected void OnInitialized()
+    {
+        _prompt = this.Configuration["Messages:App:Prompt"] ?? _prompt;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("console.log", "Blazor has been started.");
+        }
+    }
 
     private async Task OnClickButton()
     {
-        _response = await this.Helper.PromptAsync("I'm Main Server App. How are you?");
+        _response = await this.Helper.PromptAsync(_prompt);
     }
 }
