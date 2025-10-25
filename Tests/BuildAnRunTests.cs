@@ -29,7 +29,7 @@ public class BuildAnRunTests
     [10, 10, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
     ];
 
-    private string GetBinLogPath(int targetFrameworkVer,int sdkVersion, string actionName, string projectName)
+    private string GetBinLogPath(int targetFrameworkVer, int sdkVersion, string actionName, string projectName)
     {
         var slnDir = FileIO.FindContainerDirToAncestor("BlazorMixApps.Tests.slnx");
         var binlogsDir = Path.Combine(slnDir, "binlogs");
@@ -53,8 +53,9 @@ public class BuildAnRunTests
         {
             Sdk = new()
             {
-                Version = $"{sdkVersion}.0.0",
-                AllowPrerelease = sdkVersion >= 9,
+                Version = sdkVersion switch { 10 => "10.0.100-rc.1.25451.107", _ => $"{sdkVersion}.0.0" },
+                RollForward = sdkVersion switch { 10 => "disable", _ => "latestMinor" },
+                AllowPrerelease = sdkVersion >= 9
             }
         };
         globalJson.Save(Path.Combine(workDir, "global.json"));
