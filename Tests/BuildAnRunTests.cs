@@ -30,7 +30,7 @@ public class BuildAnRunTests
 
     private string GetBinLogPath(int sdkVersion, string actionName, string projectName)
     {
-        var slnDir = FileIO.FindContainerDirToAncestor("BlazorMixApps.Tests.sln");
+        var slnDir = FileIO.FindContainerDirToAncestor("BlazorMixApps.Tests.slnx");
         var binlogsDir = Path.Combine(slnDir, "binlogs");
         Directory.CreateDirectory(binlogsDir);
         return Path.Combine(binlogsDir, $"{DateTime.Now:yyyy-MM-dd-HHmmss.fff}-sdk-{sdkVersion}-{actionName}-{projectName}.binlog");
@@ -44,7 +44,7 @@ public class BuildAnRunTests
     private async ValueTask<WorkDirectory> PrepareWorkspaceAsync(int targetFrameworkVer, int sdkVersion, string mainProject)
     {
         // GIVEN: Copy projects to temporary working directory
-        var slnDir = FileIO.FindContainerDirToAncestor("BlazorMixApps.Tests.sln");
+        var slnDir = FileIO.FindContainerDirToAncestor("BlazorMixApps.Tests.slnx");
         var workDir = WorkDirectory.CreateCopyFrom(slnDir, path => !(path.Name.StartsWith(".") || "dist;Tests;bin;obj;work;binlogs".Split(';').Contains(path.Name)));
 
         // GIVEN: Create global.json to specify the SDK version
@@ -61,7 +61,7 @@ public class BuildAnRunTests
         // GIVEN: Verify the SDK version
         using var dotnetVersion = await Start("dotnet", "--version", workDir).WaitForExitAsync();
         dotnetVersion.ExitCode.Is(0);
-        dotnetVersion.Output.StartsWith($"{sdkVersion}.").IsTrue();
+        dotnetVersion.Output.StartsWith($"{sdkVersion}.").IsTrue(message: dotnetVersion.Output);
 
         // GIVEN: Rewrite the <TargetFramework> in the main project file
         var projectFilePath = Path.Combine(workDir, mainProject, $"{mainProject}.csproj");
