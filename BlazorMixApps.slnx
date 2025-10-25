@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/Build/">
+    <File Path="Build/Build.targets" />
+  </Folder>
+  <Folder Name="/CustomTasks/">
+    <File Path="Build/CustomTasks/_BS_BundleAppProjectsScopedCss.targets" />
+    <File Path="Build/CustomTasks/_BS_FilterAndRebaseItems.targets" />
+    <File Path="Build/CustomTasks/_BS_FilterAndRebaseStaticWebAssetEndPoints.targets" />
+    <File Path="Build/CustomTasks/_BS_FilterAppProjectItems.targets" />
+  </Folder>
+  <Folder Name="/Referenced/">
+    <Project Path="Referenced/RazorLib1/RazorLib1.csproj" />
+    <Project Path="Referenced/ServerApp0/ServerApp0.csproj" />
+    <Project Path="Referenced/ServerApp1/ServerApp1.csproj" />
+    <Project Path="Referenced/WasmApp0/WasmApp0.csproj" />
+    <Project Path="Referenced/WasmApp1/WasmApp1.csproj" />
+  </Folder>
+  <Project Path="MainServerApp/MainServerApp.csproj" />
+  <Project Path="MainWasmApp/MainWasmApp.csproj" />
+  <Project Path="MainWPFApp/MainWPFApp.csproj" />
+</Solution>
