@@ -53,7 +53,7 @@ public class BuildAnRunTests
         {
             Sdk = new()
             {
-                Version = sdkVersion switch { 10 => "10.0.100-rc.1.25451.107", _ => $"{sdkVersion}.0.0" },
+                Version = sdkVersion switch { 10 => "10.0.100-rc.2.25502.107", _ => $"{sdkVersion}.0.0" },
                 RollForward = sdkVersion switch { 10 => "disable", _ => "latestMinor" },
                 AllowPrerelease = sdkVersion >= 9
             }
