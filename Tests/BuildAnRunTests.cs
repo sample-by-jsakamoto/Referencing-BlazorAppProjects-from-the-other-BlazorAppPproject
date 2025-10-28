@@ -72,6 +72,22 @@ public class BuildAnRunTests
         targetFrameworkNode.Value = $"net{targetFrameworkVer}.0";
         projectFile.Save(projectFilePath);
 
+        // GIVEN: Replace index.html with index.net10.html if exists and targetFrameworkVer >= 10
+        var indexHtmlPath = Path.Combine(workDir, mainProject, "wwwroot", "index.html");
+        var indexHtmlNet10Path = Path.Combine(workDir, mainProject, "wwwroot", "index.net10.html");
+        if (File.Exists(indexHtmlNet10Path))
+        {
+            if (targetFrameworkVer >= 10)
+            {
+                File.Delete(indexHtmlPath);
+                File.Move(indexHtmlNet10Path, indexHtmlPath, overwrite: true);
+            }
+            else
+            {
+                File.Delete(indexHtmlNet10Path);
+            }
+        }
+
         return workDir;
     }
 
