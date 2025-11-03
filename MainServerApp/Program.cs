@@ -26,6 +26,9 @@ app.MapStaticAssets();
 app.UseRouting();
 
 app.MapBlazorHub();
+#if !NET8_0
+app.MapRazorPages().WithStaticAssets();
+#endif
 app.MapFallbackToPage("/_Host");
 
 app.Run();

@@ -1,4 +1,5 @@
-﻿@using Microsoft.AspNetCore.Components.Web
+@page "/"
+@using Microsoft.AspNetCore.Components.Web
 @namespace MainServerApp.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
@@ -8,17 +9,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="~/" />
-    <link rel="stylesheet" href="css/blazor-ui.css" />
-    <link rel="stylesheet" href="MainServerApp.styles.css" />
-    <style>
-        body {
-            background-color: #444;
-        }
-    </style>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="css/blazor-ui.css" asp-append-version="true" />
+    <link rel="stylesheet" href="MainServerApp.styles.css" asp-append-version="true" />
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
 </head>
 <body>
-    @RenderBody()
+    <component type="typeof(App)" render-mode="ServerPrerendered" />
 
     <div id="blazor-error-ui">
         <environment include="Staging,Production">

@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Pages\_Host.*.cshtml" />
+    <None Include="Pages\_Host.*.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Referenced\WasmApp0\WasmApp0.csproj" />
     <ProjectReference Include="..\Referenced\ServerApp1\ServerApp1.csproj" />
     <ProjectReference Include="..\Referenced\RazorLib1\RazorLib1.csproj" />

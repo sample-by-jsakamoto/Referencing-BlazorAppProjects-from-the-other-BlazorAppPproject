@@ -88,6 +88,22 @@ public class BuildAnRunTests
             }
         }
 
+        // GIVEN: Replace _Host.cshtml with _Host.net9.cshtml if exists and targetFrameworkVer >= 9
+        var hostCshtmlPath = Path.Combine(workDir, mainProject, "Pages", "_Host.cshtml");
+        var hostCshtmlNet9Path = Path.Combine(workDir, mainProject, "Pages", "_Host.net9.cshtml");
+        if (File.Exists(hostCshtmlNet9Path))
+        {
+            if (targetFrameworkVer >= 9)
+            {
+                File.Delete(hostCshtmlPath);
+                File.Move(hostCshtmlNet9Path, hostCshtmlPath, overwrite: true);
+            }
+            else
+            {
+                File.Delete(hostCshtmlNet9Path);
+            }
+        }
+
         return workDir;
     }
 
