@@ -4,7 +4,7 @@ using BlazorMixApps.Test.Fixtures;
 using Toolbelt;
 using static Toolbelt.Diagnostics.XProcess;
 
-[assembly: LevelOfParallelism(4)]
+// [assembly: LevelOfParallelism(4)]
 
 namespace BlazorMixApps.Test;
 
