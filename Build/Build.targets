@@ -7,9 +7,9 @@
 
   <!-- IDENTIFY APPLICATION PROJECTS REFERENCED FROM THIS PROJECT -->
   <Target Name="_BS_ResolveReferencedAppProject">
-	<_BS_FilterAppProjectItems ReferencedProjects="@(_MSBuildProjectReferenceExistent)">
-	  <Output TaskParameter="ReferencedAppProjects" ItemName="_BS_ReferencedAppProject" />
-	</_BS_FilterAppProjectItems>
+    <_BS_FilterAppProjectItems ReferencedProjects="@(_MSBuildProjectReferenceExistent)">
+      <Output TaskParameter="ReferencedAppProjects" ItemName="_BS_ReferencedAppProject" />
+    </_BS_FilterAppProjectItems>
   </Target>
 
   <!--
@@ -24,17 +24,17 @@
     AfterTargets="ResolveReferencedProjectsStaticWebAssets"
     BeforeTargets="UpdateLegacyPackageScopedCssBundles"
     DependsOnTargets="_BS_ResolveReferencedAppProject">
-	<_BS_BundleAppProjectsScopedCss Items="@(StaticWebAsset)" ReferencedAppProjects="@(_BS_ReferencedAppProject)">
-	  <Output TaskParameter="ProjectBundle" ItemName="_BS_ProjectBundle" />
-	  <Output TaskParameter="ProjectEndpoints" ItemName="_BS_ProjectEndpoint" />
-	</_BS_BundleAppProjectsScopedCss>
-	<ItemGroup>
-	  <_ReferencedProjectBuildStaticWebAssetsItems Include="@(_BS_ProjectBundle)" />
-	  <StaticWebAsset Include="@(_BS_ProjectBundle)" KeepMetadata="@(_StaticWebAssetCanonicalMetadata);FileLength;LastWriteTime" />
-	  <StaticWebAssetEndpoint Include="@(_BS_ProjectEndpoint)" />
-	  <_BS_ProjectBundle Remove="@(_BS_ProjectBundle)" />
-	  <_BS_ProjectEndpoint Remove="@(_BS_ProjectEndpoint)" />
-	</ItemGroup>
+    <_BS_BundleAppProjectsScopedCss Items="@(StaticWebAsset)" ReferencedAppProjects="@(_BS_ReferencedAppProject)">
+      <Output TaskParameter="ProjectBundle" ItemName="_BS_ProjectBundle" />
+      <Output TaskParameter="ProjectEndpoints" ItemName="_BS_ProjectEndpoint" />
+    </_BS_BundleAppProjectsScopedCss>
+    <ItemGroup>
+      <_ReferencedProjectBuildStaticWebAssetsItems Include="@(_BS_ProjectBundle)" />
+      <StaticWebAsset Include="@(_BS_ProjectBundle)" KeepMetadata="@(_StaticWebAssetCanonicalMetadata);FileLength;LastWriteTime" />
+      <StaticWebAssetEndpoint Include="@(_BS_ProjectEndpoint)" />
+      <_BS_ProjectBundle Remove="@(_BS_ProjectBundle)" />
+      <_BS_ProjectEndpoint Remove="@(_BS_ProjectEndpoint)" />
+    </ItemGroup>
   </Target>
 
   <!-- 
@@ -50,27 +50,27 @@
   <Target Name="_BS_Build_RemoveAppProjectsStaticWebAssets"
     AfterTargets="ResolveReferencedProjectsStaticWebAssets"
     DependsOnTargets="_BS_ResolveReferencedAppProject;_BS_Build_BundleScopedCssOfAppProjects">
-	<_BS_FilterAndRebaseItems Items="@(StaticWebAsset)" ReferencedAppProjects="@(_BS_ReferencedAppProject)">
-	  <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedStaticWebAsset" />
-	</_BS_FilterAndRebaseItems>
-	<ItemGroup>
-	  <StaticWebAsset Remove="@(StaticWebAsset)" />
-	  <StaticWebAsset Include="@(_BS_PrunedStaticWebAsset)" />
-	  <_BS_PrunedStaticWebAsset Remove="@(_BS_PrunedStaticWebAsset)" />
-	</ItemGroup>
+    <_BS_FilterAndRebaseItems Items="@(StaticWebAsset)" ReferencedAppProjects="@(_BS_ReferencedAppProject)">
+      <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedStaticWebAsset" />
+    </_BS_FilterAndRebaseItems>
+    <ItemGroup>
+      <StaticWebAsset Remove="@(StaticWebAsset)" />
+      <StaticWebAsset Include="@(_BS_PrunedStaticWebAsset)" />
+      <_BS_PrunedStaticWebAsset Remove="@(_BS_PrunedStaticWebAsset)" />
+    </ItemGroup>
   </Target>
 
   <Target Name="_BS_Build_Remove_and_Rebase_AppProjects_StaticWebAssetEndPoints"
-    AfterTargets="ResolveReferencedProjectsStaticWebAssets"
+    AfterTargets="ResolveBuildCompressedStaticWebAssets"
     DependsOnTargets="_BS_Build_RemoveAppProjectsStaticWebAssets">
-	<_BS_FilterAndRebaseStaticWebAssetEndPoints Items="@(StaticWebAssetEndPoint)" ReferencedAppProjects="@(_BS_ReferencedAppProject)">
-	  <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedStaticWebAssetEndPoint" />
-	</_BS_FilterAndRebaseStaticWebAssetEndPoints>
-	<ItemGroup>
-	  <StaticWebAssetEndPoint Remove="@(StaticWebAssetEndPoint)" />
-	  <StaticWebAssetEndPoint Include="@(_BS_PrunedStaticWebAssetEndPoint)" />
-	  <_BS_PrunedStaticWebAssetEndPoint Remove="@(_BS_PrunedStaticWebAssetEndPoint)" />
-	</ItemGroup>
+    <_BS_FilterAndRebaseStaticWebAssetEndPoints Items="@(StaticWebAssetEndPoint)" ReferencedAppProjects="@(_BS_ReferencedAppProject)">
+      <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedStaticWebAssetEndPoint" />
+    </_BS_FilterAndRebaseStaticWebAssetEndPoints>
+    <ItemGroup>
+      <StaticWebAssetEndPoint Remove="@(StaticWebAssetEndPoint)" />
+      <StaticWebAssetEndPoint Include="@(_BS_PrunedStaticWebAssetEndPoint)" />
+      <_BS_PrunedStaticWebAssetEndPoint Remove="@(_BS_PrunedStaticWebAssetEndPoint)" />
+    </ItemGroup>
   </Target>
 
   <!-- 
@@ -82,14 +82,14 @@
     Remove referenced app projects' {appName}.exe from the output folder.
   -->
   <Target Name="_BS_Build_OmmitAppHostBinary" AfterTargets="GetCopyToOutputDirectoryItems">
-	<_BS_FilterAndRebaseItems Items="@(_SourceItemsToCopyToOutputDirectory)" ReferencedAppProjects="@(_BS_ReferencedAppProject)" PruneByPath="true">
-	  <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedItem" />
-	</_BS_FilterAndRebaseItems>
-	<ItemGroup>
-	  <_SourceItemsToCopyToOutputDirectory Remove="@(_SourceItemsToCopyToOutputDirectory)" />
-	  <_SourceItemsToCopyToOutputDirectory Include="@(_BS_PrunedItem)" />
-	  <_BS_PrunedItem Remove="@(_BS_PrunedItem)" />
-	</ItemGroup>
+    <_BS_FilterAndRebaseItems Items="@(_SourceItemsToCopyToOutputDirectory)" ReferencedAppProjects="@(_BS_ReferencedAppProject)" PruneByPath="true">
+      <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedItem" />
+    </_BS_FilterAndRebaseItems>
+    <ItemGroup>
+      <_SourceItemsToCopyToOutputDirectory Remove="@(_SourceItemsToCopyToOutputDirectory)" />
+      <_SourceItemsToCopyToOutputDirectory Include="@(_BS_PrunedItem)" />
+      <_BS_PrunedItem Remove="@(_BS_PrunedItem)" />
+    </ItemGroup>
   </Target>
 
   <!-- 
@@ -101,14 +101,14 @@
     Remove referenced app projects' {appName}.exe from the publish folder.
   -->
   <Target Name="_BS_Publish_OmmitAppHostBinary" AfterTargets="GetCopyToPublishDirectoryItems">
-	<_BS_FilterAndRebaseItems Items="@(_SourceItemsToCopyToPublishDirectoryAlways)" ReferencedAppProjects="@(_BS_ReferencedAppProject)" PruneByPath="true">
-	  <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedItem" />
-	</_BS_FilterAndRebaseItems>
-	<ItemGroup>
-	  <_SourceItemsToCopyToPublishDirectoryAlways Remove="@(_SourceItemsToCopyToPublishDirectoryAlways)" />
-	  <_SourceItemsToCopyToPublishDirectoryAlways Include="@(_BS_PrunedItem)" />
-	  <_BS_PrunedItem Remove="@(_BS_PrunedItem)" />
-	</ItemGroup>
+    <_BS_FilterAndRebaseItems Items="@(_SourceItemsToCopyToPublishDirectoryAlways)" ReferencedAppProjects="@(_BS_ReferencedAppProject)" PruneByPath="true">
+      <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedItem" />
+    </_BS_FilterAndRebaseItems>
+    <ItemGroup>
+      <_SourceItemsToCopyToPublishDirectoryAlways Remove="@(_SourceItemsToCopyToPublishDirectoryAlways)" />
+      <_SourceItemsToCopyToPublishDirectoryAlways Include="@(_BS_PrunedItem)" />
+      <_BS_PrunedItem Remove="@(_BS_PrunedItem)" />
+    </ItemGroup>
   </Target>
 
   <!-- 
@@ -122,17 +122,17 @@
     AfterTargets="GetCopyToPublishDirectoryItems"
     BeforeTargets="_ComputeCopyToPublishDirectoryItems"
     DependsOnTargets="_BS_ResolveReferencedAppProject">
-	<_BS_FilterAndRebaseItems
-      Items="@(_SourceItemsToCopyToPublishDirectory)"
-      ReferencedAppProjects="@(_BS_ReferencedAppProject)"
-      PruneByPath="true">
-	  <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedSourceItemsToCopyToPublishDirectory" />
-	</_BS_FilterAndRebaseItems>
-	<ItemGroup>
-	  <_SourceItemsToCopyToPublishDirectory Remove="@(_SourceItemsToCopyToPublishDirectory)" />
-	  <_SourceItemsToCopyToPublishDirectory Include="@(_BS_PrunedSourceItemsToCopyToPublishDirectory)" />
-	  <_BS_PrunedSourceItemsToCopyToPublishDirectory Remove="@(_BS_PrunedSourceItemsToCopyToPublishDirectory)" />
-	</ItemGroup>
+    <_BS_FilterAndRebaseItems
+        Items="@(_SourceItemsToCopyToPublishDirectory)"
+        ReferencedAppProjects="@(_BS_ReferencedAppProject)"
+        PruneByPath="true">
+      <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedSourceItemsToCopyToPublishDirectory" />
+    </_BS_FilterAndRebaseItems>
+    <ItemGroup>
+      <_SourceItemsToCopyToPublishDirectory Remove="@(_SourceItemsToCopyToPublishDirectory)" />
+      <_SourceItemsToCopyToPublishDirectory Include="@(_BS_PrunedSourceItemsToCopyToPublishDirectory)" />
+      <_BS_PrunedSourceItemsToCopyToPublishDirectory Remove="@(_BS_PrunedSourceItemsToCopyToPublishDirectory)" />
+    </ItemGroup>
   </Target>
 
   <!-- 
@@ -143,9 +143,9 @@
     A subsequent target will restore them using the duplicated items.  -->
   <Target Name="_BS_Publish_Reserve_StaticWebAssetEndPoints"
     BeforeTargets="ComputeReferencedProjectsPublishAssets">
-	<ItemGroup>
-	  <_BS_ReservedStaticWebAssetEndPoint Include="@(StaticWebAssetEndPoint)" />
-	</ItemGroup>
+    <ItemGroup>
+      <_BS_ReservedStaticWebAssetEndPoint Include="@(StaticWebAssetEndPoint)" />
+    </ItemGroup>
   </Target>
 
   <!-- 
@@ -154,41 +154,54 @@
     The ComputeReferencedProjectsPublishAssets target reconstructs and breaks StaticWebAsset and StaticWebAssetEndpoint items.
     To recover from that, this target, which runs after ComputeReferencedProjectsPublishAssets, fixes StaticWebAsset and StaticWebAssetEndpoint items.
   -->
-  <Target Name="_BS_Publish_Remove_and_Rebase_AppProjects_StaticWebAssetEndPoints"
+  <Target Name="_BS_Publish_Remove_and_Rebase_AppProjects_StaticWebAssets"
     AfterTargets="ComputeReferencedProjectsPublishAssets">
 
-	<!-- Include a copy of StaticWebAssetEndpoint items saved just before ComputeReferencedProjectsPublishAssets target in the current StaticWebAssetEndpoint items.
-         Becuase some of StaticWebAssetEndpoint items are lost in ComputeReferencedProjectsPublishAssets target. -->
-	<ItemGroup>
-	  <StaticWebAssetEndPoint Include="@(_BS_ReservedStaticWebAssetEndPoint)" />
-	  <_BS_ReservedStaticWebAssetEndPoint Remove="@(_BS_ReservedStaticWebAssetEndPoint)" />
-	</ItemGroup>
+    <!-- Include a copy of StaticWebAssetEndpoint items saved just before ComputeReferencedProjectsPublishAssets target in the current StaticWebAssetEndpoint items.
+          Becuase some of StaticWebAssetEndpoint items are lost in ComputeReferencedProjectsPublishAssets target. -->
+    <ItemGroup>
+      <StaticWebAssetEndPoint Include="@(_BS_ReservedStaticWebAssetEndPoint)" />
+      <_BS_ReservedStaticWebAssetEndPoint Remove="@(_BS_ReservedStaticWebAssetEndPoint)" />
+    </ItemGroup>
 
-	<!-- Fix StaticWebAsset items.
-         - Remove StaticWebAsset items coming from referenced Blazor WebAssembly projects and whose path starts with "_framework".
-         - Fix the path of StaticWebAsset items from referenced Blazor WebAssembly projects to start with "_content/{project name}/". -->
-	<_BS_FilterAndRebaseItems Items="@(StaticWebAsset)" ReferencedAppProjects="@(_BS_ReferencedAppProject)">
-	  <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedStaticWebAsset" />
-	</_BS_FilterAndRebaseItems>
-	<ItemGroup>
-	  <StaticWebAsset Remove="@(StaticWebAsset)" />
-	  <StaticWebAsset Include="@(_BS_PrunedStaticWebAsset)" />
-	  <_BS_PrunedStaticWebAsset Remove="@(_BS_PrunedStaticWebAsset)" />
-	</ItemGroup>
+    <!-- Fix StaticWebAsset items.
+          - Remove StaticWebAsset items coming from referenced Blazor WebAssembly projects and whose path starts with "_framework".
+          - Fix the path of StaticWebAsset items from referenced Blazor WebAssembly projects to start with "_content/{project name}/". -->
+    <_BS_FilterAndRebaseItems Items="@(StaticWebAsset)" ReferencedAppProjects="@(_BS_ReferencedAppProject)">
+      <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedStaticWebAsset" />
+    </_BS_FilterAndRebaseItems>
+    <ItemGroup>
+      <StaticWebAsset Remove="@(StaticWebAsset)" />
+      <StaticWebAsset Include="@(_BS_PrunedStaticWebAsset)" />
+      <_BS_PrunedStaticWebAsset Remove="@(_BS_PrunedStaticWebAsset)" />
+    </ItemGroup>
 
-	<!-- Fix StaticWebAssetEndPoint items.
-         - Remove StaticWebAssetEndPoint items coming from referenced Blazor WebAssembly projects and whose path starts with "_framework".
-         - Fix the path of StaticWebAssetEndPoint items from referenced Blazor WebAssembly projects to start with "_content/{project name}/". 
-         - Eliminate duplicates from StaticWebAssetEndpoint items, where duplicates are determined by both ItemSpec and AssetFile. -->
-	<_BS_FilterAndRebaseStaticWebAssetEndPoints Items="@(StaticWebAssetEndPoint)" ReferencedAppProjects="@(_BS_ReferencedAppProject)">
-	  <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedStaticWebAssetEndPoint" />
-	</_BS_FilterAndRebaseStaticWebAssetEndPoints>
-	<ItemGroup>
-	  <StaticWebAssetEndPoint Remove="@(StaticWebAssetEndPoint)" />
-	  <StaticWebAssetEndPoint Include="@(_BS_PrunedStaticWebAssetEndPoint)" />
-	  <_BS_PrunedStaticWebAssetEndPoint Remove="@(_BS_PrunedStaticWebAssetEndPoint)" />
-	</ItemGroup>
-
+    <_BS_FilterAndRebaseStaticWebAssetEndPoints Items="@(StaticWebAssetEndPoint)" ReferencedAppProjects="@(_BS_ReferencedAppProject)">
+      <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedStaticWebAssetEndPoint" />
+    </_BS_FilterAndRebaseStaticWebAssetEndPoints>
+    <ItemGroup>
+      <StaticWebAssetEndPoint Remove="@(StaticWebAssetEndPoint)" />
+      <StaticWebAssetEndPoint Include="@(_BS_PrunedStaticWebAssetEndPoint)" />
+      <_BS_PrunedStaticWebAssetEndPoint Remove="@(_BS_PrunedStaticWebAssetEndPoint)" />
+    </ItemGroup>
   </Target>
 
+  <!-- 
+  *** FOR PUBLISH - Fix StaticWebAssetEndPoint items after ResolvePublishCompressedStaticWebAssets ***
+	- Remove StaticWebAssetEndPoint items coming from referenced Blazor WebAssembly projects and whose path starts with "_framework".
+	- Fix the path of StaticWebAssetEndPoint items from referenced Blazor WebAssembly projects to start with "_content/{project name}/". 
+	- Eliminate duplicates from StaticWebAssetEndpoint items, where duplicates are determined by both ItemSpec and AssetFile. -->
+  <Target Name="_BS_Publish_Remove_and_Rebase_AppProjects_StaticWebAssetEndPoints"
+    AfterTargets="ResolvePublishCompressedStaticWebAssets">
+
+    <_BS_FilterAndRebaseStaticWebAssetEndPoints Items="@(StaticWebAssetEndPoint)" ReferencedAppProjects="@(_BS_ReferencedAppProject)">
+      <Output TaskParameter="PrunedItems" ItemName="_BS_PrunedStaticWebAssetEndPoint" />
+    </_BS_FilterAndRebaseStaticWebAssetEndPoints>
+    <ItemGroup>
+      <StaticWebAssetEndPoint Remove="@(StaticWebAssetEndPoint)" />
+      <StaticWebAssetEndPoint Include="@(_BS_PrunedStaticWebAssetEndPoint)" />
+      <_BS_PrunedStaticWebAssetEndPoint Remove="@(_BS_PrunedStaticWebAssetEndPoint)" />
+    </ItemGroup>
+
+  </Target>
 </Project>
