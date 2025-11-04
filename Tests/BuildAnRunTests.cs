@@ -65,16 +65,34 @@ public class BuildAnRunTests
         dotnetVersion.ExitCode.Is(0);
         dotnetVersion.Output.StartsWith($"{sdkVersion}.").IsTrue(message: dotnetVersion.Output);
 
-        // GIVEN: Rewrite the <TargetFramework> in the main project file
-        var projectFilePath = Path.Combine(workDir, mainProject, $"{mainProject}.csproj");
+        // GIVEN: Rewrite the <TargetFramework> and allback pages in the Main project file
+        var mainProjectFilePath = Path.Combine(workDir, mainProject, $"{mainProject}.csproj");
+        UpdateProjectToTargetFramework(mainProjectFilePath, targetFrameworkVer);
+
+        // GIVEN: Rewrite the <TargetFramework> and allback pages in the Wasm0 project file
+        var wasm0ProjectFilePath = Path.Combine(workDir, "Referenced", "WasmApp0", "WasmApp0.csproj");
+        UpdateProjectToTargetFramework(wasm0ProjectFilePath, targetFrameworkVer);
+
+        return workDir;
+    }
+
+    /// <summary>
+    /// Updates the specified project file to target the given .NET framework version and replaces related web files if applicable.
+    /// </summary>
+    /// <param name="projectFilePath">The full path to the project file to update.</param>
+    /// <param name="targetFrameworkVer">The .NET target framework version to set, as an integer (for example, 10 for .NET 10.0).</param>
+    private static void UpdateProjectToTargetFramework(string projectFilePath, int targetFrameworkVer)
+    {
+        // GIVEN: Rewrite the <TargetFramework> in the project file
+        var projectDir = Path.GetDirectoryName(projectFilePath) ?? throw new Exception("The project file path is not valid.");
         var projectFile = XDocument.Load(projectFilePath);
         var targetFrameworkNode = projectFile.Root?.Element("PropertyGroup")?.Element("TargetFramework") ?? throw new Exception("The project file is not valid.");
         targetFrameworkNode.Value = $"net{targetFrameworkVer}.0";
         projectFile.Save(projectFilePath);
 
         // GIVEN: Replace index.html with index.net10.html if exists and targetFrameworkVer >= 10
-        var indexHtmlPath = Path.Combine(workDir, mainProject, "wwwroot", "index.html");
-        var indexHtmlNet10Path = Path.Combine(workDir, mainProject, "wwwroot", "index.net10.html");
+        var indexHtmlPath = Path.Combine(projectDir, "wwwroot", "index.html");
+        var indexHtmlNet10Path = Path.Combine(projectDir, "wwwroot", "index.net10.html");
         if (File.Exists(indexHtmlNet10Path))
         {
             if (targetFrameworkVer >= 10)
@@ -89,8 +107,8 @@ public class BuildAnRunTests
         }
 
         // GIVEN: Replace _Host.cshtml with _Host.net9.cshtml if exists and targetFrameworkVer >= 9
-        var hostCshtmlPath = Path.Combine(workDir, mainProject, "Pages", "_Host.cshtml");
-        var hostCshtmlNet9Path = Path.Combine(workDir, mainProject, "Pages", "_Host.net9.cshtml");
+        var hostCshtmlPath = Path.Combine(projectDir, "Pages", "_Host.cshtml");
+        var hostCshtmlNet9Path = Path.Combine(projectDir, "Pages", "_Host.net9.cshtml");
         if (File.Exists(hostCshtmlNet9Path))
         {
             if (targetFrameworkVer >= 9)
@@ -103,8 +121,6 @@ public class BuildAnRunTests
                 File.Delete(hostCshtmlNet9Path);
             }
         }
-
-        return workDir;
     }
 
     [Parallelizable(ParallelScope.Children)]
