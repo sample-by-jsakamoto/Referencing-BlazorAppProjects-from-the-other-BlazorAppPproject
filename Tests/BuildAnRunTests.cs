@@ -53,9 +53,9 @@ public class BuildAnRunTests
         {
             Sdk = new()
             {
-                Version = sdkVersion switch { 10 => "10.0.100-rc.1.25451.107", _ => $"{sdkVersion}.0.0" },
-                RollForward = sdkVersion switch { 10 => "disable", _ => "latestMinor" },
-                AllowPrerelease = sdkVersion >= 9
+                Version = $"{sdkVersion}.0.0",
+                RollForward = "latestMinor",
+                AllowPrerelease = false
             }
         };
         globalJson.Save(Path.Combine(workDir, "global.json"));
