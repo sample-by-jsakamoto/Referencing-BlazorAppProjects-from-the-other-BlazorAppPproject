@@ -17,6 +17,10 @@ public class BuildAnRunTests
     [ 8, 10, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
     [ 9, 10, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
     [10, 10, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [ 8, 11, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [ 9, 11, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [10, 11, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
+    [11, 11, "MainServerApp", new[] { "RazorLib1", "WasmApp0", "ServerApp1" }],
 
     [ 8,  8, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
     [ 8,  9, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
@@ -24,6 +28,10 @@ public class BuildAnRunTests
     [ 8, 10, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
     [ 9, 10, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
     [10, 10, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [ 8, 11, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [ 9, 11, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [10, 11, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
+    [11, 11, "MainWasmApp", new[] { "RazorLib1", "WasmApp0", "WasmApp1" }],
     ];
 
     private string GetBinLogPath(int targetFrameworkVer, int sdkVersion, string actionName, string projectName)
@@ -52,7 +60,7 @@ public class BuildAnRunTests
             {
                 Version = $"{sdkVersion}.0.0",
                 RollForward = "latestMinor",
-                AllowPrerelease = false
+                AllowPrerelease = sdkVersion == 11
             }
         };
         globalJson.Save(Path.Combine(workDir, "global.json"));
@@ -62,7 +70,7 @@ public class BuildAnRunTests
         var foundMessage = await dotnetVersion.WaitForOutputAsync(output => output.StartsWith($"{sdkVersion}."), millsecondsTimeout: 3000);
         foundMessage.IsTrue(message: $"dotnetVersion.Output is: \"{dotnetVersion.Output}\"");
         await dotnetVersion.WaitForExitAsync();
-        dotnetVersion.ExitCode.Is(0);
+        dotnetVersion.ExitCode.Is(0, message: dotnetVersion.Output);
 
         // GIVEN: Rewrite the <TargetFramework> and allback pages in the Main project file
         var mainProjectFilePath = Path.Combine(workDir, mainProject, $"{mainProject}.csproj");
