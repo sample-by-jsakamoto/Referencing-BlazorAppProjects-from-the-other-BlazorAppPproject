@@ -56,4 +56,8 @@ The custom tasks are inline C# via `RoslynCodeTaskFactory`, so they must compile
 2. Rewrites `<TargetFramework>` in the main project and `WasmApp0`, and swaps version-specific files: `wwwroot/index.net10.html` replaces `index.html` for net10+, and `Pages/_Host.net9.cshtml` replaces `_Host.cshtml` for net9+. Keep these variants in sync when changing the host pages.
 3. Builds and runs, or publishes and runs (`dotnet exec` for Server, the local `dotnet-serve` tool for Wasm), then checks over HTTP and Playwright that the scoped CSS imports, `_content/WasmApp0/assets/bg.png`, the root-relative `.js` files, the button styling, and the JS `prompt` interop all work.
 
+Always launch child `dotnet` processes through `Fixtures/DotNetCLI.Start`. The SDK 11 `dotnet test` leaks `MSBuildSDKsPath`/`MSBuildExtensionsPath` into the test process, and if a child inherits them it builds against the parent SDK's `Sdks` folder regardless of `global.json` (MSB4062 on SDK 8/9/10 cases).
+
+When filtering by test case, NUnit's filter parser rejects `(` and `"`, so combine substrings instead, e.g. `--filter 'Name~Build_and_Run_Test&Name~8,8,&Name~MainServerApp'`.
+
 Adding a new SDK/TFM means adding rows to `TestCases`, `PackageReference` groups in the Wasm `.csproj` files, and the SDK to `.github/workflows/unit-tests.yml`.

@@ -2,7 +2,6 @@
 using System.Xml.Linq;
 using BlazorMixApps.Test.Fixtures;
 using Toolbelt;
-using static Toolbelt.Diagnostics.XProcess;
 
 namespace BlazorMixApps.Test;
 
@@ -59,7 +58,7 @@ public class BuildAnRunTests
         globalJson.Save(Path.Combine(workDir, "global.json"));
 
         // GIVEN: Verify the SDK version
-        using var dotnetVersion = Start("dotnet", "--version", workDir);
+        using var dotnetVersion = DotNetCLI.Start("--version", workDir);
         var foundMessage = await dotnetVersion.WaitForOutputAsync(output => output.StartsWith($"{sdkVersion}."), millsecondsTimeout: 3000);
         foundMessage.IsTrue(message: $"dotnetVersion.Output is: \"{dotnetVersion.Output}\"");
         await dotnetVersion.WaitForExitAsync();
@@ -133,14 +132,14 @@ public class BuildAnRunTests
         // WHEN: Build the project,
         var projectDir = Path.Combine(workDir, mainProject);
         var binLog = this.GetBinLogPath(targetFrameworkVer, sdkVersion, "build", mainProject);
-        using var dotnetBuild = await Start("dotnet", $"build -f net{targetFrameworkVer}.0 -bl:\"{binLog}\"", projectDir).WaitForExitAsync();
+        using var dotnetBuild = await DotNetCLI.Start($"build -f net{targetFrameworkVer}.0 -bl:\"{binLog}\"", projectDir).WaitForExitAsync();
 
         // THEN: and it should succeed
         dotnetBuild.ExitCode.Is(0, message: dotnetBuild.Output);
 
         // WHEN: Run the project,
         var url = $"http://localhost:{TcpNetwork.GetFreeTcpPortNumber()}";
-        using var dotnetRun = Start("dotnet", $"run -f net{targetFrameworkVer}.0 --no-build --urls {url}", projectDir);
+        using var dotnetRun = DotNetCLI.Start($"run -f net{targetFrameworkVer}.0 --no-build --urls {url}", projectDir);
         var success = await dotnetRun.WaitForOutputAsync(output => output.Contains("Application started"), options => options.IdleTimeout = 10000);
         success.IsTrue(message: dotnetRun.Output);
 
@@ -159,7 +158,7 @@ public class BuildAnRunTests
         var projectDir = Path.Combine(workDir, mainProject);
         var distDir = Path.Combine(workDir, "dist");
         var binLog = this.GetBinLogPath(targetFrameworkVer, sdkVersion, "publish", mainProject);
-        using var dotnetPublish = await Start("dotnet", $"publish -c Release -f net{targetFrameworkVer}.0 -o \"{distDir}\" -bl:\"{binLog}\"", projectDir).WaitForExitAsync();
+        using var dotnetPublish = await DotNetCLI.Start($"publish -c Release -f net{targetFrameworkVer}.0 -o \"{distDir}\" -bl:\"{binLog}\"", projectDir).WaitForExitAsync();
 
         // THEN: and it should succeed
         dotnetPublish.ExitCode.Is(0, message: dotnetPublish.Output);
@@ -169,11 +168,11 @@ public class BuildAnRunTests
         var url = $"http://localhost:{tcpPort}";
         var wwwrootDir = Path.Combine(distDir, "wwwroot");
         var testProjDir = FileIO.FindContainerDirToAncestor("BlazorMixApps.Test.csproj");
-        (await Start("dotnet", "tool restore", testProjDir).WaitForExitAsync()).Dispose();
+        (await DotNetCLI.Start("tool restore", testProjDir).WaitForExitAsync()).Dispose();
 
         using var dotnetExec =
-            File.Exists(Path.Combine(distDir, $"{mainProject}.dll")) ? Start("dotnet", $"exec \"{mainProject}.dll\" --urls {url}", distDir) :
-            Directory.Exists(wwwrootDir) ? Start("dotnet", $"serve -d:\"{wwwrootDir}\" -p:{tcpPort} --default-extensions:html", testProjDir)
+            File.Exists(Path.Combine(distDir, $"{mainProject}.dll")) ? DotNetCLI.Start($"exec \"{mainProject}.dll\" --urls {url}", distDir) :
+            Directory.Exists(wwwrootDir) ? DotNetCLI.Start($"serve -d:\"{wwwrootDir}\" -p:{tcpPort} --default-extensions:html", testProjDir)
             : throw new Exception("The published app is not tested yet.");
 
         var success = await dotnetExec.WaitForOutputAsync(output => output.Contains("Press CTRL+C to ", StringComparison.InvariantCultureIgnoreCase), options => options.IdleTimeout = 5000);
