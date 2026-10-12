@@ -21,6 +21,12 @@ jobs:
             9.0.x
             10.0.x
 
+      - name: Setup .NET SDK (preview)
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 11.0.x
+          dotnet-quality: preview
+
       # Perform unit tests
       - name: Perform unit tests
         run: dotnet test --project ./Tests/BlazorMixApps.Test.csproj --settings ./.runsettings
