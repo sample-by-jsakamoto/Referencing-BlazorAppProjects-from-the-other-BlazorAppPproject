@@ -3,8 +3,8 @@
     "runner": "Microsoft.Testing.Platform"
   },
   "sdk": {
-    "version": "10.0.100",
-    "allowPrerelease": false,
-    "rollForward": "disable"
+    "version": "11.0.0",
+    "allowPrerelease": true,
+    "rollForward": "latestMinor"
   }
 }
